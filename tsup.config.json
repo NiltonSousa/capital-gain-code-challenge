@@ -1,0 +1,9 @@
+{
+  "$schema": "https://cdn.jsdelivr.net/npm/tsup/schema.json",
+  "format": "esm",
+  "sourcemap": true,
+  "target": "node20",
+  "platform": "node",
+  "clean": true,
+  "entry": ["src/**/*.ts"]
+}
