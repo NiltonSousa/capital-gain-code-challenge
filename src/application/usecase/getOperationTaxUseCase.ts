@@ -2,6 +2,7 @@ import { OperationEntity, OperationType } from "src/domain/entity";
 import { IGetOperationTaxUseCase, IGetOperationTaxUseCaseResponse } from "src/domain/usecase";
 
 export class GetOperationTaxUseCaseImpl implements IGetOperationTaxUseCase {
+    private readonly taxFreeTrashould = 20000;
     private currentAveragePrice: number = 0;
     private currentQuantity: number = 0;
     private totalOperationLoss: number = 0;
@@ -11,18 +12,6 @@ export class GetOperationTaxUseCaseImpl implements IGetOperationTaxUseCase {
         this.resetState();
 
         for (const operation of operations) {
-            const totalOperationAmount = operation.unitCost * operation.quantity;
-
-            if (totalOperationAmount <= 20000) {
-                this.sumTotalOperationLoss(operation);
-
-                this.calculateTotalStocksQuantity(operation);
-
-                this.response.push({ tax: 0.0 });
-
-                continue;
-            }
-
             if (operation.type === OperationType.BUY) {
                 this.currentAveragePrice = operation.calculateAveragePrice(this.currentAveragePrice, this.currentQuantity);
 
@@ -35,6 +24,7 @@ export class GetOperationTaxUseCaseImpl implements IGetOperationTaxUseCase {
 
             this.calculateTotalStocksQuantity(operation);
 
+            // Verifica se tem prejuízo
             if (operation.unitCost < this.currentAveragePrice) {
                 this.sumTotalOperationLoss(operation);
 
@@ -43,10 +33,18 @@ export class GetOperationTaxUseCaseImpl implements IGetOperationTaxUseCase {
                 continue;
             }
 
-
+            // Verifica se tem lucro
             const profit = operation.calculateProfit(this.currentAveragePrice);
 
-            if (profit > 0 && this.totalOperationLoss > 0) {
+            if (profit > 0) {
+                const totalOperationAmount = operation.unitCost * operation.quantity;
+
+                if (totalOperationAmount <= this.taxFreeTrashould) {
+                    this.response.push({ tax: 0.0 });
+
+                    continue;
+                }
+
                 if (this.totalOperationLoss >= profit) {
                     this.totalOperationLoss -= profit;
 
