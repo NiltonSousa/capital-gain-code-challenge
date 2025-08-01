@@ -1,19 +1,38 @@
 {
   "transform": {
-    "\\.ts$": ["ts-jest"]
+    "\\.ts$": [
+      "ts-jest"
+    ]
   },
   "moduleNameMapper": {
     "^src/(.*)$": "<rootDir>/src/$1",
     "^tests/(.*)$": "<rootDir>/tests/$1"
   },
-  "modulePaths": ["node_modules"],
-  "modulePathIgnorePatterns": ["dist"],
-  "collectCoverageFrom": ["src/**/*.ts"],
+  "modulePaths": [
+    "node_modules"
+  ],
+  "modulePathIgnorePatterns": [
+    "dist"
+  ],
+  "collectCoverageFrom": [
+    "src/**/*.ts"
+  ],
   "resetMocks": true,
   "clearMocks": true,
   "testEnvironment": "node",
-  "testMatch": ["**/*.spec.ts"],
+  "testMatch": [
+    "**/*.spec.ts"
+  ],
   "preset": "ts-jest",
-  "roots": ["<rootDir>/tests", "<rootDir>/src"],
-  "coveragePathIgnorePatterns": ["dist", "node_modules"]
+  "roots": [
+    "<rootDir>/tests",
+    "<rootDir>/src"
+  ],
+  "coveragePathIgnorePatterns": [
+    "dist",
+    "node_modules"
+  ],
+  "setupFiles": [
+    "./jest.setEnvVars.js"
+  ]
 }

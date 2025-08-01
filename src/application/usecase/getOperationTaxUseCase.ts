@@ -1,46 +1,44 @@
 import { OperationEntity, OperationType } from "src/domain/entity";
 import { IGetOperationTaxUseCase, IGetOperationTaxUseCaseResponse } from "src/domain/usecase";
+import { TAX_FREE_THRESHOLD } from "src/infra/envs/env";
 
 export class GetOperationTaxUseCaseImpl implements IGetOperationTaxUseCase {
-    private readonly taxFreeTrashould = 20000;
+    private taxResponse: IGetOperationTaxUseCaseResponse = [];
     private currentAveragePrice: number = 0;
-    private currentQuantity: number = 0;
+    private currentStockQuantity: number = 0;
     private totalOperationLoss: number = 0;
-    private response: IGetOperationTaxUseCaseResponse = [];
 
     async calculate(operations: OperationEntity[]): Promise<IGetOperationTaxUseCaseResponse> {
         this.resetState();
 
         for (const operation of operations) {
             if (operation.type === OperationType.BUY) {
-                this.currentAveragePrice = operation.calculateAveragePrice(this.currentAveragePrice, this.currentQuantity);
+                this.currentAveragePrice = operation.calculateAveragePrice(this.currentAveragePrice, this.currentStockQuantity);
 
-                this.calculateTotalStocksQuantity(operation);
+                this.updateCurrentStockQuantity(operation);
 
-                this.response.push({ tax: 0.0 });
+                this.taxResponse.push({ tax: 0.0 });
 
                 continue;
             }
 
-            this.calculateTotalStocksQuantity(operation);
+            this.updateCurrentStockQuantity(operation);
 
-            // Verifica se tem prejuízo
             if (operation.unitCost < this.currentAveragePrice) {
-                this.sumTotalOperationLoss(operation);
+                this.accumulateOperationLoss(operation);
 
-                this.response.push({ tax: 0.0 });
+                this.taxResponse.push({ tax: 0.0 });
 
                 continue;
             }
 
-            // Verifica se tem lucro
             const profit = operation.calculateProfit(this.currentAveragePrice);
 
             if (profit > 0) {
                 const totalOperationAmount = operation.unitCost * operation.quantity;
 
-                if (totalOperationAmount <= this.taxFreeTrashould) {
-                    this.response.push({ tax: 0.0 });
+                if (totalOperationAmount <= TAX_FREE_THRESHOLD) {
+                    this.taxResponse.push({ tax: 0.0 });
 
                     continue;
                 }
@@ -48,46 +46,46 @@ export class GetOperationTaxUseCaseImpl implements IGetOperationTaxUseCase {
                 if (this.totalOperationLoss >= profit) {
                     this.totalOperationLoss -= profit;
 
-                    this.response.push({ tax: 0.0 });
-
-                    continue;
-                } else {
-                    const remainingProfit = profit - this.totalOperationLoss;
-
-                    this.totalOperationLoss = 0;
-
-                    this.response.push({ tax: remainingProfit * 0.2 });
+                    this.taxResponse.push({ tax: 0.0 });
 
                     continue;
                 }
+
+                const remainingProfit = profit - this.totalOperationLoss;
+
+                this.totalOperationLoss = 0;
+
+                this.taxResponse.push({ tax: remainingProfit * 0.2 });
+
+                continue;
             }
 
-            this.response.push({ tax: operation.calculateTax(this.currentAveragePrice) });
+            this.taxResponse.push({ tax: operation.calculateTax(this.currentAveragePrice) });
         }
 
-        return this.response;
+        return this.taxResponse;
     }
 
-    private calculateTotalStocksQuantity(operation: OperationEntity): number {
+    private updateCurrentStockQuantity(operation: OperationEntity): number {
         if (operation.type === OperationType.BUY) {
-            this.currentQuantity += operation.quantity;
+            this.currentStockQuantity += operation.quantity;
 
-            return this.currentQuantity;
+            return this.currentStockQuantity;
         }
 
-        this.currentQuantity -= operation.quantity;
+        this.currentStockQuantity -= operation.quantity;
 
-        return this.currentQuantity;
+        return this.currentStockQuantity;
     }
 
-    private sumTotalOperationLoss(operation: OperationEntity): void {
+    private accumulateOperationLoss(operation: OperationEntity): void {
         this.totalOperationLoss += (this.currentAveragePrice - operation.unitCost) * operation.quantity;
     }
 
     private resetState(): void {
         this.currentAveragePrice = 0;
-        this.currentQuantity = 0;
+        this.currentStockQuantity = 0;
         this.totalOperationLoss = 0;
-        this.response = [];
+        this.taxResponse = [];
     }
 }

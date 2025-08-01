@@ -6,6 +6,5 @@ export function mockOperationEntity(overrides?: Partial<OperationEntity>): Opera
         overrides?.type || OperationType.BUY,
         overrides?.unitCost || faker.number.float({ min: 1, max: 100 }),
         overrides?.quantity || faker.number.float({ min: 1, max: 100 }),
-        overrides?.tax || null,
     );
 }
