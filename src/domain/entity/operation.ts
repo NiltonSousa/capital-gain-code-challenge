@@ -1,29 +1,51 @@
 export enum OperationType {
-    BUY = "buy",
-    SELL = "sell",
+  BUY = "buy",
+  SELL = "sell",
 }
 
 export class OperationEntity {
-    constructor(
-        public readonly type: OperationType,
-        public readonly unitCost: number,
-        public readonly quantity: number,
-    ) {}
+  constructor(
+    public readonly type: OperationType,
+    public readonly unitCost: number,
+    public readonly quantity: number
+  ) {}
 
-    calculateAveragePrice(pastAveragePrice: number = 0, currentQuantity: number = 0): number {
-        const totalCost = (pastAveragePrice * currentQuantity) + (this.unitCost * this.quantity);
-        const totalQuantity = currentQuantity + this.quantity;
+  static build(inputObject: object[]): OperationEntity[] {
+    return inputObject.map((input) => {
+      if (
+        !("operation" in input) ||
+        !("unit-cost" in input) ||
+        !("quantity" in input)
+      ) {
+        throw new Error("Input must contain type, unitCost, and quantity");
+      }
 
-        return parseFloat((totalCost / totalQuantity).toFixed(2));
-    }
+      return new OperationEntity(
+        input.operation as OperationType,
+        input["unit-cost"] as number,
+        input.quantity as number
+      );
+    });
+  }
 
-    calculateProfit(averagePrice: number): number {
-        return (this.unitCost - averagePrice) * this.quantity;
-    }
+  calculateAveragePrice(
+    pastAveragePrice: number = 0,
+    currentQuantity: number = 0
+  ): number {
+    const totalCost =
+      pastAveragePrice * currentQuantity + this.unitCost * this.quantity;
+    const totalQuantity = currentQuantity + this.quantity;
 
-    calculateTax(averagePrice: number): number {
-        const profit = this.calculateProfit(averagePrice);
+    return parseFloat((totalCost / totalQuantity).toFixed(2));
+  }
 
-        return profit > 0 ? profit * 0.2 : 0;
-    }
+  calculateProfit(averagePrice: number): number {
+    return (this.unitCost - averagePrice) * this.quantity;
+  }
+
+  calculateTax(averagePrice: number): number {
+    const profit = this.calculateProfit(averagePrice);
+
+    return profit > 0 ? profit * 0.2 : 0;
+  }
 }

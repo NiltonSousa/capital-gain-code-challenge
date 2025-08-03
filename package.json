@@ -2,28 +2,22 @@
   "name": "capital-gain-code-challenge",
   "version": "1.0.0",
   "description": "",
-  "main": "index.js",
+  "main": "main.ts",
+  "type": "module",
   "scripts": {
     "start": "npm run build && npx tsx ./src/main/main.ts",
     "check": "npm run check:type && npm run check:lint",
     "check:lint": "eslint --quiet 'src/**/*.ts'",
     "check:type": "tsc --noEmit",
+    "eslint:fix": "eslint --fix '{src,tests}/**/*.ts'",
     "build": "npx tsup",
     "test": "npx jest --projects jest.config.json"
   },
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/NiltonSousa/capital-gain-code-challenge.git"
-  },
-  "author": "Nilton Sousa",
+  "author": "Nubank",
   "license": "ISC",
-  "bugs": {
-    "url": "https://github.com/NiltonSousa/capital-gain-code-challenge/issues"
-  },
   "engines": {
     "node": ">=20"
   },
-  "homepage": "https://github.com/NiltonSousa/capital-gain-code-challenge#readme",
   "dependencies": {
     "joi": "^17.13.3"
   },
