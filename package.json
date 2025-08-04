@@ -11,15 +11,14 @@
     "check:type": "tsc --noEmit",
     "eslint:fix": "eslint --fix '{src,tests}/**/*.ts'",
     "build": "npx tsup",
-    "test": "npx jest --projects jest.config.json"
+    "test": "npx jest --projects jest.config.json --projects jest.config.integration.json",
+    "test:unit": "npx jest --projects jest.config.json",
+    "test:integration": "npx jest --projects jest.config.integration.json"
   },
   "author": "Nubank",
   "license": "ISC",
   "engines": {
     "node": ">=20"
-  },
-  "dependencies": {
-    "joi": "^17.13.3"
   },
   "devDependencies": {
     "@faker-js/faker": "^9.9.0",
