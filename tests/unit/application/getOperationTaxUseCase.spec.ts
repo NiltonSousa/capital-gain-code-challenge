@@ -1,7 +1,7 @@
 import { describe } from "node:test";
 import { GetOperationTaxUseCaseImpl } from "src/application/usecase";
 import { OperationType } from "src/domain/entity";
-import { mockOperationEntity } from "../mock/domain/operation";
+import { mockOperationEntity } from "../../mock/domain/operation";
 
 describe("GetOperationTaxUseCase", () => {
   let sut: GetOperationTaxUseCaseImpl;
