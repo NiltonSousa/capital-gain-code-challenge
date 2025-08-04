@@ -1,5 +1,5 @@
-import { handler } from "src/main/cli/cli";
-import { runWithInputStream } from "src/main/common";
+import { handler } from "src/cli/cli";
+import { runWithInputStream } from "src/cli/common";
 import { Readable } from "stream";
 
 describe("Integration - main.ts by stdin", () => {

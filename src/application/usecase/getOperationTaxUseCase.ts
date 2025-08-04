@@ -1,9 +1,9 @@
+import { TAX_FREE_THRESHOLD } from "src/cli/envs/env";
 import { type OperationEntity, OperationType } from "src/domain/entity";
 import {
   type IGetOperationTaxUseCase,
   type IGetOperationTaxUseCaseResponse,
 } from "src/domain/usecase";
-import { TAX_FREE_THRESHOLD } from "src/infra/envs/env";
 
 export class GetOperationTaxUseCaseImpl implements IGetOperationTaxUseCase {
   private taxResponse: IGetOperationTaxUseCaseResponse = [];

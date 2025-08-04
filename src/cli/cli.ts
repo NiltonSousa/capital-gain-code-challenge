@@ -1,7 +1,7 @@
 #!/usr/bin/env node
+import { runWithInputStream } from "src/cli/common";
+import { makeGetOperationTaxUseCase } from "src/cli/factory/application";
 import { OperationEntity } from "src/domain/entity";
-import { runWithInputStream } from "src/main/common";
-import { makeGetOperationTaxUseCase } from "src/main/factory/application";
 
 export function handler(stdin: string): string[] {
   const useCase = makeGetOperationTaxUseCase();
