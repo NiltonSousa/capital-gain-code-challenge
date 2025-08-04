@@ -5,7 +5,7 @@
   "main": "main.ts",
   "type": "module",
   "scripts": {
-    "start": "npm run build && npx tsx ./src/main/main.ts",
+    "start": "npm run build && node ./dist/cli/cli.js",
     "check": "npm run check:type && npm run check:lint",
     "check:lint": "eslint --quiet 'src/**/*.ts'",
     "check:type": "tsc --noEmit",
