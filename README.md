@@ -1,11 +1,14 @@
+# Capital Gain CLI 💵
+
 ## Overview
+![Nubank](https://img.shields.io/badge/nubank-820AD1?style=for-the-badge&logo=nubank&logoColor=white) ![NodeJS](https://img.shields.io/badge/Node%20js-339933?style=for-the-badge&logo=nodedotjs&logoColor=white)![Typescript](https://img.shields.io/badge/TypeScript-007ACC?style=for-the-badge&logo=typescript&logoColor=white)
+
+**capital-gain-code-challenge** is a project designed to calculate capital gains for various financial assets. It provides a robust, testable, and containerized solution for processing transactions and computing taxes according to standard operation rules.
 
 ## Requirements
 - [Docker](https://www.docker.com/)
 - [Node (20)](https://nodejs.org/en/)
 
-
-**capital-gain-code-challenge** is a project designed to calculate capital gains for various financial assets. It provides a robust, testable, and containerized solution for processing transactions and computing taxes according to standard operation rules.
 
 ## Architecture
 
