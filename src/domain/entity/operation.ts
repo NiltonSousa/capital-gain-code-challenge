@@ -1,6 +1,14 @@
+import { TAX_RATE } from "src/cli/envs/env";
+
 export enum OperationType {
   BUY = "buy",
   SELL = "sell",
+}
+
+export interface OperationInputDTO {
+  operation: OperationType;
+  "unit-cost": number;
+  quantity: number;
 }
 
 export class OperationEntity {
@@ -10,7 +18,11 @@ export class OperationEntity {
     public readonly quantity: number
   ) {}
 
-  static build(inputObject: object[]): OperationEntity[] {
+  /**
+   * Builds a list of OperationEntity objects from an array of plain objects (e.g. parsed from JSON).
+   * @throws Error if input properties are missing or invalid
+   */
+  static build(inputObject: OperationInputDTO[]): OperationEntity[] {
     return inputObject.map((input) => {
       if (
         !("operation" in input) ||
@@ -21,9 +33,9 @@ export class OperationEntity {
       }
 
       return new OperationEntity(
-        input.operation as OperationType,
-        input["unit-cost"] as number,
-        input.quantity as number
+        input.operation,
+        input["unit-cost"],
+        input.quantity
       );
     });
   }
@@ -46,6 +58,6 @@ export class OperationEntity {
   calculateTax(averagePrice: number): number {
     const profit = this.calculateProfit(averagePrice);
 
-    return profit > 0 ? profit * 0.2 : 0;
+    return profit > 0 ? profit * TAX_RATE : 0;
   }
 }

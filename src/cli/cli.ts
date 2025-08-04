@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 import { runWithInputStream } from "src/cli/common";
 import { makeGetOperationTaxUseCase } from "src/cli/factory/application";
-import { OperationEntity } from "src/domain/entity";
+import { OperationEntity, type OperationInputDTO } from "src/domain/entity";
 
 export function handler(stdin: string): string[] {
   const useCase = makeGetOperationTaxUseCase();
@@ -11,7 +11,9 @@ export function handler(stdin: string): string[] {
   for (const line of lines) {
     if (!line.trim()) continue;
     const inputObject = JSON.parse(line);
-    const operations = OperationEntity.build(inputObject as object[]);
+    const operations = OperationEntity.build(
+      inputObject as OperationInputDTO[]
+    );
     const response = useCase.calculate(operations);
     outputs.push(JSON.stringify(response));
   }

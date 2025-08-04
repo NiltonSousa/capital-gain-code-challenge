@@ -1,4 +1,4 @@
-import { TAX_FREE_THRESHOLD } from "src/cli/envs/env";
+import { TAX_FREE_THRESHOLD, TAX_RATE } from "src/cli/envs/env";
 import { type OperationEntity, OperationType } from "src/domain/entity";
 import {
   type IGetOperationTaxUseCase,
@@ -11,6 +11,11 @@ export class GetOperationTaxUseCaseImpl implements IGetOperationTaxUseCase {
   private currentStockQuantity: number = 0;
   private totalOperationLoss: number = 0;
 
+  /**
+   * Calculates the tax for a series of operations according to business rules.
+   * @param operations Array of OperationEntity representing sequential operations (buy or sell).
+   * @returns Array of tax results per operation.
+   */
   calculate(operations: OperationEntity[]): IGetOperationTaxUseCaseResponse {
     this.resetState();
 
@@ -32,36 +37,13 @@ export class GetOperationTaxUseCaseImpl implements IGetOperationTaxUseCase {
 
       if (operation.unitCost < this.currentAveragePrice) {
         this.accumulateOperationLoss(operation);
-
-        this.taxResponse.push({ tax: 0.0 });
-
         continue;
       }
 
       const profit = operation.calculateProfit(this.currentAveragePrice);
 
       if (profit > 0) {
-        const totalOperationAmount = operation.unitCost * operation.quantity;
-
-        if (totalOperationAmount <= TAX_FREE_THRESHOLD) {
-          this.taxResponse.push({ tax: 0.0 });
-
-          continue;
-        }
-
-        if (this.totalOperationLoss >= profit) {
-          this.totalOperationLoss -= profit;
-
-          this.taxResponse.push({ tax: 0.0 });
-
-          continue;
-        }
-
-        const remainingProfit = profit - this.totalOperationLoss;
-
-        this.totalOperationLoss = 0;
-
-        this.taxResponse.push({ tax: remainingProfit * 0.2 });
+        this.applyTaxableProfit(operation, profit);
 
         continue;
       }
@@ -89,6 +71,32 @@ export class GetOperationTaxUseCaseImpl implements IGetOperationTaxUseCase {
   private accumulateOperationLoss(operation: OperationEntity): void {
     this.totalOperationLoss +=
       (this.currentAveragePrice - operation.unitCost) * operation.quantity;
+
+    this.taxResponse.push({ tax: 0.0 });
+  }
+
+  private applyTaxableProfit(operation: OperationEntity, profit: number): void {
+    const totalOperationAmount = operation.unitCost * operation.quantity;
+
+    if (totalOperationAmount <= TAX_FREE_THRESHOLD) {
+      this.taxResponse.push({ tax: 0.0 });
+
+      return;
+    }
+
+    if (this.totalOperationLoss >= profit) {
+      this.totalOperationLoss -= profit;
+
+      this.taxResponse.push({ tax: 0.0 });
+
+      return;
+    }
+
+    const remainingProfit = profit - this.totalOperationLoss;
+
+    this.totalOperationLoss = 0;
+
+    this.taxResponse.push({ tax: remainingProfit * TAX_RATE });
   }
 
   private resetState(): void {
